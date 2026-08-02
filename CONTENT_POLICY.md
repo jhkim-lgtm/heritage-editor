@@ -2,7 +2,15 @@
 
 ## 이미지
 
+- 모든 카드 이미지는 브랜드를 듣자마자 떠오르는 단 하나의 대표 피사체에 집중한다. 우선순위는 시그니처 제품 → 상징 동물·문양 → 상징 건물·공방 → 핵심 소재이다.
+- 이미지 배정은 `브랜드 전용 검증 자산` → `브랜드명·시그니처 검색이 검증된 Wikimedia Commons 자산` → `업종 대체 자산` 순으로 선택한다.
+- 업종 대체 자산을 실제 브랜드 전용 자산처럼 표기하지 않는다. 화면에 `SOURCE REVIEW`와 대체 장수를 표시하고, 발행 전 교체한다.
+- 브랜드 이미지 프로필은 `primary`, `alternate`, `material`, `motif`, `landmark`, `founder`를 구조화해 관리한다. `INFO.productName`과 `FACTS[3]`은 시그니처 제품의 차선 근거로 쓴다.
+- 자산은 `brand`, `slot`, `subject`, `originalId`, `sourceUrl`, `credit`, `license`, `cutoutEligible`를 기록한다. Commons 자산은 파일 설명 페이지와 라이선스를 출처 영역에 공개한다.
+- 서명된 Instagram CDN URL과 여러 브랜드에 공유된 `BRAND_MEDIA` 자산은 자동 표지·카드 소스로 사용하지 않는다.
+- AI로 제작한 전용 자산은 실제 아카이브 사진으로 위장하지 않고 `1%CLUB AI STUDIO / GENERATED EDITORIAL`로 표기한다.
 - 한 브랜드의 8장 세트 안에서 같은 원본 사진은 한 번만 사용한다.
+- 중복은 표시 URL이 아닌 `originalId`를 기준으로 검사한다. 세로·가로 파생본이나 누끼 PNG도 같은 원본 ID를 유지한다.
 - 표지는 `cover` 전용 이미지 배정만 사용하며 `product`, `heroshot` 등 본문 카드 이미지를 대신 가져오지 않는다.
 - 고유 후보가 소진되면 이미 사용한 사진을 반복하지 않고 해당 카드 전용 생성 배경을 사용한다.
 - 사용자가 같은 이미지를 다른 카드에 다시 올리면 적용하지 않고 중복 안내를 표시한다.

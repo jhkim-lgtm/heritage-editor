@@ -137,13 +137,15 @@
       if (!wrap) return;
       const existing = wrap.querySelector(".object-tools");
       if (existing) existing.remove();
-      const hasImage = Boolean(state.imgs.cover);
+      const automatic = !state.imgs.cover && catImgFor(state.brand, "cover");
+      const canAdoptAutomatic = Boolean(automatic && automatic.cutoutEligible && (automatic.d || automatic.w));
+      const hasImage = Boolean(state.imgs.cover || canAdoptAutomatic);
       const hasOriginal = Boolean(state.imgOriginals.cover && state.imgOriginalBrands.cover === state.brand);
-      const hasCutout = Boolean(state.cutoutApplied.cover && hasImage);
+      const hasCutout = Boolean(state.cutoutApplied.cover && state.imgs.cover);
       const tools = document.createElement("div");
       tools.className = "object-tools";
       tools.innerHTML = `
-        <span class="object-tools__status">${hasCutout ? "투명 배경 적용됨" : hasImage ? "원본 보존됨 · 누끼 가능" : "표지 사진을 올리면 누끼 가능"}</span>
+        <span class="object-tools__status">${hasCutout ? "투명 배경 적용됨" : state.imgs.cover ? "원본 보존됨 · 누끼 가능" : canAdoptAutomatic ? "대표 오브제 원본 · 바로 누끼 가능" : "표지 사진을 올리면 누끼 가능"}</span>
         <button type="button" data-cutout-open ${hasImage ? "" : "disabled"}>배경 제거</button>
         <button type="button" data-cutout-restore ${hasOriginal ? "" : "disabled"}>원본 복원</button>
         <button type="button" data-cutout-download ${hasCutout ? "" : "disabled"}>누끼 PNG</button>`;
@@ -298,7 +300,18 @@
       }));
 
       function openPanel() {
-        if (!state.imgs.cover) return;
+        if (!state.imgs.cover) {
+          const automatic = catImgFor(state.brand, "cover");
+          const source = automatic && automatic.cutoutEligible && (automatic.d || automatic.w);
+          if (!source) return;
+          state.imgs.cover = source;
+          state.imgOriginals.cover = source;
+          state.imgOriginalBrands.cover = state.brand;
+          delete state.cutoutApplied.cover;
+          delete state.cutoutSettings.cover;
+          patchCard("cover");
+          decorateCoverTools();
+        }
         if (!state.imgOriginals.cover || state.imgOriginalBrands.cover !== state.brand) {
           state.imgOriginals.cover = state.imgs.cover;
           state.imgOriginalBrands.cover = state.brand;
