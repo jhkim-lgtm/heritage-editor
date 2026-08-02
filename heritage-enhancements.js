@@ -25,6 +25,16 @@
       button.querySelector(".theme-toggle__icon").textContent = isDark ? "☾" : "☀";
       button.querySelector(".theme-toggle__label").textContent = isDark ? "다크 모드" : "라이트 모드";
     }
+    applyInterfaceLogos();
+  }
+
+  function applyInterfaceLogos() {
+    if (typeof LOGO_1PCT === "undefined") return;
+    document.querySelectorAll("img[data-pct-logo]").forEach(image => {
+      const requested = image.dataset.pctLogo;
+      const onDark = requested === "light" || (requested === "auto" && document.documentElement.dataset.theme === "dark");
+      image.src = onDark ? LOGO_1PCT.light : LOGO_1PCT.dark;
+    });
   }
 
   applyTheme(getSavedTheme(), false);
@@ -42,6 +52,7 @@
     state.cutoutApplied = state.cutoutApplied || {};
     state.cutoutSettings = state.cutoutSettings || {};
 
+    applyInterfaceLogos();
     installThemeToggle();
     installObjectCover();
     installCutoutDialog();
@@ -69,9 +80,8 @@
     }
 
     function installObjectCover() {
-      if (!COVER_STYLES.some(item => item.id === "object")) {
-        COVER_STYLES.unshift({ id: "object", t: "오브제 포커스" });
-      }
+      /* 표지는 이미지 재사용 경로가 없는 매거진 커버 형식 하나로 고정한다. */
+      COVER_STYLES.splice(0, COVER_STYLES.length, { id: "object", t: "매거진 커버" });
 
       const baseRenderCard = renderCard;
       renderCard = function enhancedRenderCard(cardKey, palette, info) {
@@ -97,25 +107,29 @@
     function renderObjectCover(palette, info) {
       const brand = state.brand;
       const uploaded = state.imgs.cover;
-      const fallback = !uploaded && (catImgFor(brand, "product") || catImgFor(brand, "cover"));
-      const source = uploaded || (fallback && (fallback.w || fallback.d));
+      /* 표지는 cover 전용 배정만 사용한다. product/heroshot fallback은 중복을 만들므로 금지한다. */
+      const coverAsset = !uploaded && catImgFor(brand, "cover");
+      const source = uploaded || (coverAsset && (coverAsset.d || coverAsset.w)) || genBg(brand, "cover", palette);
       const isCutout = Boolean(state.cutoutApplied.cover && uploaded);
-      const image = source
-        ? `<img class="object-cover__image ${isCutout ? "is-cutout" : "is-photo"}" src="${source}" alt="">`
-        : '<div class="object-cover__empty">Upload one object</div>';
-      const dark = palIsDark(palette);
-      return `<div class="object-cover" style="--bg:${palette.bg};--tx:${palette.tx};background:${palette.bg};color:${palette.tx}">
-        <div class="object-cover__glow"></div>
+      const credit = uploaded
+        ? (state.imgCredit ? `PHOTO · ${state.imgCredit}` : "")
+        : (coverAsset ? `PHOTO · ${coverAsset.c.toUpperCase()} / ${(coverAsset.s || "UNSPLASH").toUpperCase()}` : "");
+      const issue = String((seedOf(brand) % 98) + 1).padStart(2, "0");
+      return `<div class="object-cover magazine-cover ${isCutout ? "has-cutout" : "has-photo"}" style="--bg:${palette.bg};--tx:${palette.tx};background:${palette.bg};color:#fff">
+        <img class="object-cover__image ${isCutout ? "is-cutout" : "is-photo"}" src="${source}" alt="${brand} 매거진 표지">
+        <div class="magazine-cover__scrim"></div>
         <div class="object-cover__top">
-          <span>1% CLUB · OBJECT STUDY</span><span class="object-cover__top-line"></span><span>N° ${String((seedOf(brand) % 98) + 1).padStart(2, "0")}</span>
+          <span class="magazine-cover__publisher">${pctImg(2.65, true)}</span><span class="object-cover__top-line"></span><span>ISSUE ${issue} · 2026</span>
         </div>
-        <div class="object-cover__visual">${image}</div>
+        <div class="magazine-cover__rail">OBJECTS · CRAFT · LEGACY</div>
         <div class="object-cover__footer">
-          <div class="object-cover__wordmark">${wordmark(brand, uploaded ? 9.2 : 10.5, palette)}</div>
-          <div class="object-cover__meta">${info.cat.toUpperCase()} · EST. ${info.founded} · ${info.place}</div>
-          <div class="curline" style="margin-top:2.8cqw"><span>CURATED BY</span>${pctImg(2.8, dark, "display:inline-block")}</div>
+          <div class="magazine-cover__eyebrow">THE ${info.cat.toUpperCase()} ISSUE</div>
+          <div class="object-cover__wordmark">${wordmark(brand, uploaded ? 9.2 : 10.5, { bg: "#101010", tx: "#ffffff" })}</div>
+          <div class="object-cover__meta">EST. ${info.founded} · ${info.place} · A STUDY IN ENDURING INFLUENCE</div>
+          <div class="magazine-cover__coverline">VISION, CRAFT AND THE OBJECTS THAT OUTLIVE A SEASON</div>
         </div>
-      </div>${photoCred("cover")}`;
+        ${credit ? `<div class="photocred magazine-cover__credit">${credit}</div>` : ""}
+      </div>`;
     }
 
     function decorateCoverTools() {
@@ -158,11 +172,15 @@
       const randomButton = document.getElementById("rand");
       if (brandInput) brandInput.addEventListener("input", clearImageHistory);
       if (randomButton) randomButton.addEventListener("click", clearImageHistory);
+      document.addEventListener("heritage:image-duplicate", event => showImagePolicyNotice(event.detail));
     }
 
     function preserveOriginal(file, key) {
       const reader = new FileReader();
       reader.onload = () => {
+        const candidates = [...Object.entries(state.imgs), ...Object.entries(state.imgOriginals)];
+        const duplicate = candidates.find(([otherKey, value]) => otherKey !== key && value === reader.result);
+        if (duplicate) return;
         state.imgOriginals[key] = reader.result;
         state.imgOriginalBrands[key] = state.brand;
         delete state.cutoutApplied[key];
@@ -170,6 +188,23 @@
         if (key === "cover") decorateCoverTools();
       };
       reader.readAsDataURL(file);
+    }
+
+    let imagePolicyTimer = 0;
+    function showImagePolicyNotice(detail) {
+      let notice = document.getElementById("imagePolicyNotice");
+      if (!notice) {
+        notice = document.createElement("div");
+        notice.id = "imagePolicyNotice";
+        notice.className = "image-policy-notice";
+        notice.setAttribute("role", "status");
+        document.body.appendChild(notice);
+      }
+      const duplicateLabel = (CARDS.find(card => card.key === detail.duplicateKey) || {}).label || detail.duplicateKey;
+      notice.textContent = `같은 이미지는 한 브랜드에서 한 번만 쓸 수 있어요. 이미 ${duplicateLabel}에 사용 중입니다.`;
+      notice.classList.add("is-visible");
+      clearTimeout(imagePolicyTimer);
+      imagePolicyTimer = setTimeout(() => notice.classList.remove("is-visible"), 3200);
     }
 
     function clearImageHistory() {
