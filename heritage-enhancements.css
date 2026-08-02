@@ -63,6 +63,10 @@ html[data-theme="light"] .slidecap .find:hover {
   color: #1b64da;
 }
 
+.kicker { display: flex; align-items: center; gap: 11px; }
+.kicker img { width: 58px; height: auto; display: block; }
+.kicker span { opacity: .9; }
+
 html[data-theme="light"] .sw { border-color: rgba(0, 27, 55, .16); }
 html[data-theme="light"] .sw[aria-pressed="true"] {
   box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--toss-blue);
@@ -125,131 +129,154 @@ html[data-theme="light"] #pw-gate .pw-sub { color: var(--toss-text-3); }
   line-height: 1;
 }
 
-/* Cover object composition: a 62%-high safe stage, slightly above center. */
+/* Magazine cover policy: one full-bleed cover asset, protected masthead/footer lanes. */
 .object-cover {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  color: var(--tx);
+  color: #fff;
   background: var(--bg);
 }
 
-.object-cover__glow {
+.object-cover__image {
   position: absolute;
   z-index: 0;
-  top: 13cqw;
-  left: 14cqw;
-  width: 72cqw;
-  height: 72cqw;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,.06) 46%, transparent 72%);
-  opacity: .72;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: 50% 48%;
+  filter: saturate(.82) contrast(1.07);
+  transform: scale(1.012);
+}
+
+.magazine-cover.has-cutout .object-cover__image {
+  inset: 15cqw 4cqw 30cqw;
+  width: 92cqw;
+  height: 80cqw;
+  object-fit: contain;
+  object-position: 50% 48%;
+  filter: drop-shadow(0 6cqw 8cqw rgba(0,0,0,.35));
+  transform: none;
+}
+
+.magazine-cover__scrim {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(7,8,10,.62) 0%, rgba(7,8,10,.12) 24%, rgba(7,8,10,.03) 48%, rgba(7,8,10,.82) 100%),
+    linear-gradient(90deg, rgba(7,8,10,.18), transparent 42%, rgba(7,8,10,.08));
+}
+
+.magazine-cover.has-cutout .magazine-cover__scrim {
+  background:
+    radial-gradient(75% 55% at 50% 42%, rgba(255,255,255,.16), transparent 70%),
+    linear-gradient(180deg, rgba(7,8,10,.2), transparent 43%, rgba(7,8,10,.56));
 }
 
 .object-cover__top {
   position: absolute;
-  z-index: 4;
-  top: 7cqw;
+  z-index: 3;
+  top: 6.2cqw;
   left: 7cqw;
   right: 7cqw;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 4cqw;
+  gap: 3cqw;
   font-family: var(--f-jost);
-  font-size: 2.1cqw;
+  font-size: 1.75cqw;
   font-weight: 600;
-  letter-spacing: .16em;
+  letter-spacing: .2em;
   text-transform: uppercase;
-  opacity: .72;
+  text-shadow: 0 .3cqw 1.4cqw rgba(0,0,0,.4);
+}
+
+.magazine-cover__publisher {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
 }
 
 .object-cover__top-line {
   height: .14cqw;
   flex: 1;
   background: currentColor;
-  opacity: .36;
+  opacity: .54;
 }
 
-.object-cover__visual {
+.magazine-cover__rail {
   position: absolute;
-  z-index: 2;
-  top: 18cqw;
-  left: 10cqw;
-  right: 10cqw;
-  height: 76cqw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2cqw 4cqw 3cqw;
-}
-
-.object-cover__visual::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: 18%;
-  right: 18%;
-  bottom: 1cqw;
-  height: 7cqw;
-  border-radius: 50%;
-  background: rgba(0,0,0,.32);
-  filter: blur(4cqw);
-  opacity: .55;
-}
-
-.object-cover__image {
-  display: block;
-  max-width: 72cqw;
-  max-height: 72cqw;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  object-position: 50% 46%;
-  filter: drop-shadow(0 5cqw 6cqw rgba(0,0,0,.28));
-}
-
-.object-cover__image.is-photo {
-  max-width: 68cqw;
-  max-height: 66cqw;
-  border-radius: 2cqw;
-  box-shadow: 0 4cqw 12cqw rgba(0,0,0,.22);
-}
-
-.object-cover__empty {
-  width: 64cqw;
-  height: 58cqw;
-  display: grid;
-  place-items: center;
-  border: .2cqw dashed currentColor;
-  border-radius: 50%;
+  z-index: 3;
+  top: 24cqw;
+  right: 4.3cqw;
+  writing-mode: vertical-rl;
   font-family: var(--f-jost);
-  font-size: 2.2cqw;
-  letter-spacing: .08em;
+  font-size: 1.45cqw;
+  letter-spacing: .26em;
   text-transform: uppercase;
-  opacity: .38;
+  opacity: .74;
+  text-shadow: 0 .3cqw 1.2cqw rgba(0,0,0,.5);
 }
 
 .object-cover__footer {
   position: absolute;
-  z-index: 4;
+  z-index: 3;
   left: 7cqw;
   right: 7cqw;
-  bottom: 6.5cqw;
+  bottom: 7.2cqw;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
+  text-shadow: 0 .5cqw 2cqw rgba(0,0,0,.5);
 }
 
-.object-cover__wordmark { width: 82cqw; }
-.object-cover__meta {
-  margin-top: 2.8cqw;
+.magazine-cover__eyebrow {
+  margin-bottom: 2.2cqw;
   font-family: var(--f-jost);
-  font-size: 1.9cqw;
-  letter-spacing: .16em;
+  font-size: 1.65cqw;
+  font-weight: 650;
+  letter-spacing: .28em;
   text-transform: uppercase;
-  opacity: .65;
+}
+
+.object-cover__wordmark {
+  width: 78cqw;
+  min-height: 10cqw;
+  display: flex;
+  align-items: flex-end;
+}
+
+.object-cover__meta {
+  margin-top: 2.1cqw;
+  font-family: var(--f-jost);
+  font-size: 1.65cqw;
+  line-height: 1.5;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  opacity: .86;
+}
+
+.magazine-cover__coverline {
+  width: 56cqw;
+  margin-top: 2.5cqw;
+  padding-top: 2cqw;
+  border-top: .14cqw solid rgba(255,255,255,.62);
+  font-family: var(--f-jost);
+  font-size: 1.48cqw;
+  line-height: 1.5;
+  letter-spacing: .2em;
+}
+
+.magazine-cover__credit {
+  z-index: 4 !important;
+  right: 5cqw !important;
+  bottom: 2.2cqw !important;
+  left: auto !important;
+  color: rgba(255,255,255,.62) !important;
+  text-shadow: 0 .3cqw 1cqw rgba(0,0,0,.7);
 }
 
 .object-tools {
@@ -289,6 +316,31 @@ html[data-theme="light"] #pw-gate .pw-sub { color: var(--toss-text-3); }
 
 html[data-theme="light"] .object-tools button:hover:not(:disabled) { color: #1b64da; }
 .object-tools button:disabled { cursor: not-allowed; opacity: .38; }
+
+.image-policy-notice {
+  position: fixed;
+  z-index: 10020;
+  left: 50%;
+  bottom: 28px;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: #20242b;
+  color: #fff;
+  box-shadow: 0 16px 42px rgba(0,0,0,.28);
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 12px);
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+.image-policy-notice.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
 
 .cutout-panel[hidden] { display: none; }
 .cutout-panel {
