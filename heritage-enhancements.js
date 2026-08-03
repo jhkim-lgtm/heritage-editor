@@ -127,12 +127,9 @@
         <div class="object-cover__top" style="justify-content:center">
           <span class="magazine-cover__publisher">${pctImg(3.1, true)}</span>
         </div>
-        <div class="magazine-cover__rail">OBJECTS · CRAFT · LEGACY</div>
         <div class="object-cover__footer">
-          <div class="magazine-cover__eyebrow">THE ${info.cat.toUpperCase()} ISSUE</div>
           <div class="object-cover__wordmark">${wordmark(brand, uploaded ? 9.2 : 10.5, { bg: "#101010", tx: "#ffffff" })}</div>
-          <div class="object-cover__meta">EST. ${info.founded} · ${info.place} · A STUDY IN ENDURING INFLUENCE</div>
-          <div class="magazine-cover__coverline">VISION, CRAFT AND THE OBJECTS THAT OUTLIVE A SEASON</div>
+          <div class="magazine-cover__coverline">Introducing the Brands that define the top 1% — vision, craft, and enduring influence.</div>
         </div>
         ${credit ? `<div class="photocred magazine-cover__credit">${credit}</div>` : ""}
       </div>`;

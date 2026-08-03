@@ -374,8 +374,8 @@ html[data-theme="light"] .iconic-status.is-fallback { color: #a45f00; }
   bottom: 7.2cqw;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+  align-items: center;
+  text-align: center;
   text-shadow: 0 .5cqw 2cqw rgba(0,0,0,.5);
 }
 
@@ -406,14 +406,13 @@ html[data-theme="light"] .iconic-status.is-fallback { color: #a45f00; }
 }
 
 .magazine-cover__coverline {
-  width: 56cqw;
-  margin-top: 2.5cqw;
-  padding-top: 2cqw;
-  border-top: .14cqw solid rgba(255,255,255,.62);
+  max-width: 78cqw;
+  margin-top: 2.4cqw;
   font-family: var(--f-jost);
-  font-size: 1.48cqw;
+  font-size: 1.6cqw;
   line-height: 1.5;
-  letter-spacing: .2em;
+  letter-spacing: .08em;
+  opacity: .92;
 }
 
 .magazine-cover__credit {
@@ -601,3 +600,17 @@ html[data-theme="light"] .object-tools button:hover:not(:disabled) { color: #1b6
   .cutout-dialog { max-height: calc(100vh - 24px); padding: 18px; border-radius: 16px; }
   .cutout-previews, .cutout-sliders { grid-template-columns: 1fr; }
 }
+
+/* 레퍼런스 A/B/C: 이미지 밴드는 풀-밴드로 채우고 내부 라벨은 숨긴다 */
+.tplband .iconic-imgwin__image,
+.tplband .iconic-imgwin.is-local .iconic-imgwin__image {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(.92) contrast(1.03);
+}
+.tplband .iconic-imgwin__matte,
+.tplband .iconic-imgwin__subject,
+.tplband .iconic-imgwin__wash { display: none; }
+.tplband .photocred2 { left: auto; right: 3cqw; }

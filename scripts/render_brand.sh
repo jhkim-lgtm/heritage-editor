@@ -9,9 +9,7 @@ OUT="${3:-$DIR/published/$BRAND}"
 CH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 case "$SERIES" in
   A) KEYS=(cover heroshot product founder quote heritage behind closing);;
-  B) KEYS=(cover heritage product heroshot behind quote founder closing);;
-  C) KEYS=(cover quote heroshot heritage founder behind product closing);;
-  *) echo "시리즈는 A/B/C"; exit 1;;
+  *) echo "시리즈는 A만 지원"; exit 1;;
 esac
 ENC=$(python3 -c "import urllib.parse,sys;print(urllib.parse.quote(sys.argv[1]))" "$BRAND")
 mkdir -p "$OUT"
