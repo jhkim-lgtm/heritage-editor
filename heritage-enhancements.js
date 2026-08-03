@@ -58,7 +58,7 @@
     installCutoutDialog();
     installUploadCapture();
 
-    state.cover = "object";
+    if (!COVER_STYLES.some(item => item.id === state.cover)) state.cover = "object";
     rebuildCoverChoices();
     reRender();
 
@@ -81,7 +81,13 @@
 
     function installObjectCover() {
       /* 표지는 이미지 재사용 경로가 없는 매거진 커버 형식 하나로 고정한다. */
-      COVER_STYLES.splice(0, COVER_STYLES.length, { id: "object", t: "매거진 커버" });
+      COVER_STYLES.splice(0, COVER_STYLES.length,
+        { id: "object", t: "매거진 커버" },
+        { id: "copyC", t: "카피 중앙" },
+        { id: "copyL", t: "카피 좌측" },
+        { id: "tplA", t: "레퍼런스 A" },
+        { id: "tplB", t: "레퍼런스 B" },
+        { id: "tplC", t: "레퍼런스 C" });
 
       const baseRenderCard = renderCard;
       renderCard = function enhancedRenderCard(cardKey, palette, info) {
@@ -118,8 +124,8 @@
       return `<div class="object-cover magazine-cover ${isCutout ? "has-cutout" : "has-photo"}" style="--bg:${palette.bg};--tx:${palette.tx};background:${palette.bg};color:#fff">
         <img class="object-cover__image ${isCutout ? "is-cutout" : "is-photo"}" src="${source}" alt="${brand} 매거진 표지">
         <div class="magazine-cover__scrim"></div>
-        <div class="object-cover__top">
-          <span class="magazine-cover__publisher">${pctImg(2.65, true)}</span><span class="object-cover__top-line"></span><span>ISSUE ${issue} · 2026</span>
+        <div class="object-cover__top" style="justify-content:center">
+          <span class="magazine-cover__publisher">${pctImg(3.1, true)}</span>
         </div>
         <div class="magazine-cover__rail">OBJECTS · CRAFT · LEGACY</div>
         <div class="object-cover__footer">
@@ -137,13 +143,15 @@
       if (!wrap) return;
       const existing = wrap.querySelector(".object-tools");
       if (existing) existing.remove();
-      const hasImage = Boolean(state.imgs.cover);
+      const automatic = !state.imgs.cover && catImgFor(state.brand, "cover");
+      const canAdoptAutomatic = Boolean(automatic && automatic.cutoutEligible && (automatic.d || automatic.w));
+      const hasImage = Boolean(state.imgs.cover || canAdoptAutomatic);
       const hasOriginal = Boolean(state.imgOriginals.cover && state.imgOriginalBrands.cover === state.brand);
-      const hasCutout = Boolean(state.cutoutApplied.cover && hasImage);
+      const hasCutout = Boolean(state.cutoutApplied.cover && state.imgs.cover);
       const tools = document.createElement("div");
       tools.className = "object-tools";
       tools.innerHTML = `
-        <span class="object-tools__status">${hasCutout ? "투명 배경 적용됨" : hasImage ? "원본 보존됨 · 누끼 가능" : "표지 사진을 올리면 누끼 가능"}</span>
+        <span class="object-tools__status">${hasCutout ? "투명 배경 적용됨" : state.imgs.cover ? "원본 보존됨 · 누끼 가능" : canAdoptAutomatic ? "대표 오브제 원본 · 바로 누끼 가능" : "표지 사진을 올리면 누끼 가능"}</span>
         <button type="button" data-cutout-open ${hasImage ? "" : "disabled"}>배경 제거</button>
         <button type="button" data-cutout-restore ${hasOriginal ? "" : "disabled"}>원본 복원</button>
         <button type="button" data-cutout-download ${hasCutout ? "" : "disabled"}>누끼 PNG</button>`;
@@ -298,7 +306,18 @@
       }));
 
       function openPanel() {
-        if (!state.imgs.cover) return;
+        if (!state.imgs.cover) {
+          const automatic = catImgFor(state.brand, "cover");
+          const source = automatic && automatic.cutoutEligible && (automatic.d || automatic.w);
+          if (!source) return;
+          state.imgs.cover = source;
+          state.imgOriginals.cover = source;
+          state.imgOriginalBrands.cover = state.brand;
+          delete state.cutoutApplied.cover;
+          delete state.cutoutSettings.cover;
+          patchCard("cover");
+          decorateCoverTools();
+        }
         if (!state.imgOriginals.cover || state.imgOriginalBrands.cover !== state.brand) {
           state.imgOriginals.cover = state.imgs.cover;
           state.imgOriginalBrands.cover = state.brand;
