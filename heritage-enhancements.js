@@ -58,7 +58,7 @@
     installCutoutDialog();
     installUploadCapture();
 
-    state.cover = "object";
+    if (!COVER_STYLES.some(item => item.id === state.cover)) state.cover = "object";
     rebuildCoverChoices();
     reRender();
 
@@ -81,7 +81,13 @@
 
     function installObjectCover() {
       /* 표지는 이미지 재사용 경로가 없는 매거진 커버 형식 하나로 고정한다. */
-      COVER_STYLES.splice(0, COVER_STYLES.length, { id: "object", t: "매거진 커버" });
+      COVER_STYLES.splice(0, COVER_STYLES.length,
+        { id: "object", t: "매거진 커버" },
+        { id: "copyC", t: "카피 중앙" },
+        { id: "copyL", t: "카피 좌측" },
+        { id: "tplA", t: "레퍼런스 A" },
+        { id: "tplB", t: "레퍼런스 B" },
+        { id: "tplC", t: "레퍼런스 C" });
 
       const baseRenderCard = renderCard;
       renderCard = function enhancedRenderCard(cardKey, palette, info) {
@@ -118,8 +124,8 @@
       return `<div class="object-cover magazine-cover ${isCutout ? "has-cutout" : "has-photo"}" style="--bg:${palette.bg};--tx:${palette.tx};background:${palette.bg};color:#fff">
         <img class="object-cover__image ${isCutout ? "is-cutout" : "is-photo"}" src="${source}" alt="${brand} 매거진 표지">
         <div class="magazine-cover__scrim"></div>
-        <div class="object-cover__top">
-          <span class="magazine-cover__publisher">${pctImg(2.65, true)}</span><span class="object-cover__top-line"></span><span>ISSUE ${issue} · 2026</span>
+        <div class="object-cover__top" style="justify-content:center">
+          <span class="magazine-cover__publisher">${pctImg(3.1, true)}</span>
         </div>
         <div class="magazine-cover__rail">OBJECTS · CRAFT · LEGACY</div>
         <div class="object-cover__footer">
